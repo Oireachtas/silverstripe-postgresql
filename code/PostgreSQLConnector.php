@@ -248,6 +248,10 @@ class PostgreSQLConnector extends DBConnector
     public function quoteString($value)
     {
         if (function_exists('pg_escape_literal')) {
+            if (is_null($value)) {
+                return $value;
+            }
+
             return pg_escape_literal($this->dbConn, $value);
         } else {
             return "'" . $this->escapeString($value) . "'";
