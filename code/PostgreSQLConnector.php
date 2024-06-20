@@ -216,6 +216,10 @@ class PostgreSQLConnector extends DBConnector
             $parameters = $this->parameterValues($parameters);
         }
 
+        // 20th June 2024.
+        // A custom fix by Michael Houghton to resolve an issue with the Publications search
+        $sql = $this->fixWhereClause($sql);
+
         // Execute query
         // Unfortunately error-suppression is required in order to handle sql errors elegantly.
         if (!empty($parameters)) {
@@ -266,5 +270,17 @@ class PostgreSQLConnector extends DBConnector
     public function unloadDatabase()
     {
         $this->databaseName = null;
+    }
+
+    private function fixWhereClause($sql)
+    {
+        if (str_contains($sql, '()')) {
+            $sql = nl2br($sql);
+            $sql = str_replace(PHP_EOL, '', $sql);
+            $sql = str_replace('()<br /> AND ', '', $sql);
+            $sql = str_replace("<br />", "\n", $sql);
+        }
+
+        return $sql;
     }
 }

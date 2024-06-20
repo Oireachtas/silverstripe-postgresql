@@ -50,3 +50,7 @@ purposes, and you get the full benefits of T-Search.
 
 If you are using unsupported modules, there may be instances of MySQL-specific 
 SQL queries which will need to be made database-agnostic where possible.
+
+## Oireachtas Changes
+
+This version includes a custom change in code/PostgreSQLConnector.php file which fixes a bug related to the code generating a WHERE clause like WHERE ().  This code change is referenced as fixWhereClause().
