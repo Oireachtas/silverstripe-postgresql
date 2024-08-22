@@ -57,6 +57,11 @@ class PostgreSQLQuery extends Query
         }
     }
 
+    public function getColumnNames()
+    {
+        return $this->columnNames;
+    }
+
     public function getIterator(): Iterator
     {
         while ($row = pg_fetch_array($this->handle, null, PGSQL_NUM)) {
