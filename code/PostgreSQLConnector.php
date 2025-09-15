@@ -285,6 +285,10 @@ class PostgreSQLConnector extends DBConnector
             $sql = str_replace("<br />", "\n", $sql);
         }
 
+        if (str_contains($sql, ', ,')) {
+            $sql = str_replace(', ,', ',', $sql);
+        }
+
         return $sql;
     }
 }
