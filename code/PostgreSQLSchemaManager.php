@@ -1505,4 +1505,54 @@ class PostgreSQLSchemaManager extends DBSchemaManager
         user_error("PostGreSQL does not support multi-enum", E_USER_ERROR);
         return "int";
     }
+
+    /**
+     * Implode list of column definitions for an index, safely supporting order modifiers.
+     *
+     * Supports:
+     *  - Title
+     *  - "Title"
+     *  - Title DESC
+     *  - Title ASC
+     *  - Title DESC NULLS LAST / NULLS FIRST
+     *
+     * @param array $columns
+     */
+    protected function implodeColumnList($columns): string
+    {
+        $parts = [];
+
+        foreach ((array)$columns as $col) {
+            $col = trim((string)$col);
+
+            // Already a raw expression? Keep as-is.
+            // (e.g. "lower(\"Title\")" or similar)
+            if ($col === '' || preg_match('/[()]/', $col)) {
+                $parts[] = $col;
+                continue;
+            }
+
+            // Match: identifier + optional direction + optional nulls ordering
+            // Example: IsFolder DESC
+            // Example: IsFolder DESC NULLS LAST
+            if (preg_match('/^"?([A-Za-z_][A-Za-z0-9_]*)"?\s+(ASC|DESC)(\s+NULLS\s+(FIRST|LAST))?$/i', $col, $m)) {
+                $name = $m[1];
+                $dir  = strtoupper($m[2]);
+                $nulls = isset($m[3]) ? strtoupper($m[3]) : '';
+                $parts[] = "\"{$name}\" {$dir}{$nulls}";
+                continue;
+            }
+
+            // Plain identifier
+            if (preg_match('/^"?([A-Za-z_][A-Za-z0-9_]*)"?$/', $col, $m)) {
+                $parts[] = "\"{$m[1]}\"";
+                continue;
+            }
+
+            // Fallback: pass-through (or throw if you prefer strict)
+            $parts[] = $col;
+        }
+
+        return implode(',', $parts);
+    }
 }
