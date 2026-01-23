@@ -16,7 +16,7 @@
     ],
     "require": {
         "silverstripe/framework": "^6",
-        "silverstripe/vendor-plugin": "^2",
+        "silverstripe/vendor-plugin": "^3",
         "ext-pgsql": "*"
     },
     "require-dev": {
